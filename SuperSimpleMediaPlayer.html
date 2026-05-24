@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Simple Player</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="icon" href="https://raw.githubusercontent.com/NOF7351/KST-Tools/refs/heads/main/Resourses/supersimplemediaplayer-logo.png" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="icon" href="https://raw.githubusercontent.com/NOF7351/KST-Tools/refs/heads/main/Resourses/supersimplemediaplayer-logo.png" type="image/x-icon" />
+
     <!-- Yandex.RTB -->
-    <script>window.yaContextCb=window.yaContextCb||[]</script>
+    <script>window.yaContextCb = window.yaContextCb || []</script>
     <script src="https://yandex.ru/ads/system/context.js" async></script>
+
     <style>
-        /* --- CSS: Основа и Фон --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -19,11 +25,41 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            overflow: hidden;
+            color: white;
+            position: relative;
+            background: #111;
+        }
+
+        /* Анимированный фон */
+        .dynamic-bg {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at center,
+                    rgba(255, 0, 150, 0.35),
+                    rgba(0, 0, 0, 0.95));
+            filter: blur(50px);
+            transform: scale(1.2);
+            transition:
+                background 0.2s linear,
+                transform 0.15s linear;
+            z-index: -2;
+        }
+
+        /* Дополнительный градиент */
+        .overlay-gradient {
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(-45deg,
+                    rgba(238,119,82,0.5),
+                    rgba(231,60,126,0.5),
+                    rgba(35,166,213,0.5),
+                    rgba(35,213,171,0.5));
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
-            color: white;
-            overflow: hidden;
+            z-index: -1;
         }
 
         @keyframes gradientBG {
@@ -32,42 +68,70 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- CSS: Стеклянная панель --- */
+        /* Glass */
         .glass-container {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.08);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px;
             padding: 40px;
             width: 90%;
             max-width: 800px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
             text-align: center;
             position: relative;
             display: flex;
             flex-direction: column;
             max-height: 90vh;
-            overflow-y: auto;
+            overflow: hidden;
+
+            transition:
+                max-width 0.9s ease-in-out,
+                padding 0.9s ease-in-out,
+                transform 0.9s ease-in-out;
         }
 
-        h1 { margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        p.subtitle { color: rgba(255,255,255,0.8); margin-bottom: 30px; font-size: 0.9em; }
+        /* Режим Ambient */
+        .glass-container.ambient {
+            max-width: 1050px;
+            padding: 55px;
+            transform: scale(1.03);
+        }
 
-        /* --- CSS: Зона загрузки --- */
+        h1 {
+            margin-bottom: 5px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        p.subtitle {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
         .drop-zone {
-            border: 2px dashed rgba(255, 255, 255, 0.4);
+            border: 2px dashed rgba(255,255,255,0.4);
             border-radius: 15px;
             padding: 50px 20px;
             cursor: pointer;
             transition: 0.3s;
         }
-        .drop-zone:hover { background: rgba(255,255,255,0.1); border-color: white; }
-        .drop-zone span { pointer-events: none; font-size: 1.1em; }
 
-        input[type="file"] { display: none; }
+        .drop-zone:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
 
-        /* --- CSS: Контент плеера --- */
+        .drop-zone span {
+            pointer-events: none;
+            font-size: 1.1em;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
         #media-content {
             display: none;
             flex-direction: column;
@@ -77,26 +141,35 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        img, video {
+        img,
+        video {
             max-width: 100%;
             max-height: 50vh;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        audio { width: 100%; margin-top: 20px; border-radius: 50px; }
+        audio {
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 50px;
+        }
 
-        /* Стили Canvas (Визуализатор) */
         canvas {
             width: 100%;
-            height: 150px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            /* background: rgba(0,0,0,0.2); Можно включить для отладки фона */
+            height: 160px;
+            border-radius: 12px;
+            margin-bottom: 20px;
         }
 
         .file-info {
@@ -119,25 +192,89 @@
             cursor: pointer;
             display: none;
             transition: 0.2s;
+            z-index: 20;
         }
-        .close-btn:hover { transform: scale(1.2); color: #ffadad; }
+
+        .close-btn:hover {
+            transform: scale(1.2);
+            color: #ffadad;
+        }
+
+        /* Обложка */
+        .album-wrapper {
+            width: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition:
+                width 1s ease-in-out,
+                opacity 1s ease-in-out,
+                margin-bottom 1s ease-in-out;
+            margin-bottom: 0;
+        }
+
+        .glass-container.ambient .album-wrapper {
+            width: 280px;
+            opacity: 1;
+            margin-bottom: 25px;
+        }
+
+        .album-cover {
+            width: 280px;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 24px;
+            box-shadow:
+                0 20px 50px rgba(0,0,0,0.45),
+                0 0 40px rgba(255,255,255,0.08);
+            animation: rotateAlbum 20s linear infinite;
+        }
+
+        @keyframes rotateAlbum {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .audio-layout {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @media (max-width: 700px) {
+            .glass-container.ambient {
+                max-width: 95%;
+                padding: 35px 25px;
+            }
+
+            .glass-container.ambient .album-wrapper {
+                width: 200px;
+            }
+
+            .album-cover {
+                width: 200px;
+                height: 200px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="glass-container">
+    <div class="dynamic-bg" id="dynamic-bg"></div>
+    <div class="overlay-gradient"></div>
+
+    <div class="glass-container" id="glass-container">
         <button id="close-btn" class="close-btn">×</button>
-        
+
         <h1 id="main-title">Супер простой медиаплеер</h1>
         <p class="subtitle">Перетащите файл сюда</p>
 
         <div id="drop-zone" class="drop-zone">
             <span>📂 Загрузить файл</span>
-            <input id="file-input" type="file" accept="image/*,video/*,audio/*">
+            <input id="file-input" type="file" accept="image/*,video/*,audio/*" />
         </div>
 
-        <div id="media-content">
-            </div>
+        <div id="media-content"></div>
     </div>
 
     <script>
@@ -146,11 +283,12 @@
         const mediaContent = document.getElementById('media-content');
         const closeBtn = document.getElementById('close-btn');
         const title = document.getElementById('main-title');
+        const glassContainer = document.getElementById('glass-container');
+        const dynamicBg = document.getElementById('dynamic-bg');
 
-        // Переменные для аудио-визуализации
         let audioContext, analyser, source, animationId;
+        let ambientTimeout = null;
 
-        // --- Обработчики событий ---
         dropZone.addEventListener('click', () => fileInput.click());
 
         dropZone.addEventListener('dragover', (e) => {
@@ -165,27 +303,47 @@
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.style.background = 'transparent';
-            if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
         });
 
         fileInput.addEventListener('change', (e) => {
-            if(e.target.files.length) handleFile(e.target.files[0]);
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
         });
 
         closeBtn.addEventListener('click', resetPlayer);
 
-        // --- Основная логика ---
-        function handleFile(file) {
-            resetPlayer(); // Сначала очищаем всё старое
+        // Сброс таймера бездействия
+        function resetAmbientTimer() {
+            glassContainer.classList.remove('ambient');
+
+            clearTimeout(ambientTimeout);
+
+            ambientTimeout = setTimeout(() => {
+                glassContainer.classList.add('ambient');
+            }, 5000);
+        }
+
+        // События активности
+        ['mousemove', 'click', 'keydown', 'touchstart'].forEach(event => {
+            window.addEventListener(event, resetAmbientTimer);
+        });
+
+        async function handleFile(file) {
+            resetPlayer();
 
             const fileURL = URL.createObjectURL(file);
             const type = file.type;
-            
-            // Скрываем зону загрузки
+
             dropZone.style.display = 'none';
             mediaContent.style.display = 'flex';
             closeBtn.style.display = 'block';
             document.querySelector('.subtitle').style.display = 'none';
+
             title.textContent = 'Сейчас воспроизводится';
 
             let element;
@@ -194,67 +352,97 @@
                 element = document.createElement('img');
                 element.src = fileURL;
                 mediaContent.appendChild(element);
-            } 
+            }
+
             else if (type.startsWith('video/')) {
                 element = document.createElement('video');
                 element.src = fileURL;
                 element.controls = true;
                 element.autoplay = true;
+
                 mediaContent.appendChild(element);
-            } 
+            }
+
             else if (type.startsWith('audio/')) {
-                // Создаем Canvas для визуализатора
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'audio-layout';
+
+                // Обложка
+                const albumWrapper = document.createElement('div');
+                albumWrapper.className = 'album-wrapper';
+
+                const albumCover = document.createElement('img');
+                albumCover.className = 'album-cover';
+
+                // Случайная обложка
+                albumCover.src =
+                    'https://picsum.photos/600?random=' + Date.now();
+
+                albumWrapper.appendChild(albumCover);
+
+                // Canvas
                 const canvas = document.createElement('canvas');
                 canvas.id = 'visualizer';
-                mediaContent.appendChild(canvas);
 
-                // Создаем Аудио элемент
+                // Audio
                 element = document.createElement('audio');
                 element.src = fileURL;
                 element.controls = true;
                 element.autoplay = true;
-                // Атрибут crossorigin важен для некоторых браузеров, хотя для blob он не обязателен
-                element.crossOrigin = "anonymous"; 
-                mediaContent.appendChild(element);
+                element.crossOrigin = "anonymous";
 
-                // Запускаем визуализатор после начала воспроизведения
-                // (Браузеры требуют взаимодействия пользователя перед запуском AudioContext)
+                wrapper.appendChild(albumWrapper);
+                wrapper.appendChild(canvas);
+                wrapper.appendChild(element);
+
+                mediaContent.appendChild(wrapper);
+
                 element.onplay = () => {
-                    if (!audioContext) initAudioContext(element, canvas);
-                    if (audioContext.state === 'suspended') audioContext.resume();
+                    if (!audioContext) {
+                        initAudioContext(element, canvas);
+                    }
+
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+
+                    resetAmbientTimer();
                 };
             }
 
-            // Добавляем имя файла
             const info = document.createElement('div');
             info.className = 'file-info';
             info.textContent = file.name;
+
             mediaContent.appendChild(info);
         }
 
-        // --- Логика Web Audio API ---
         function initAudioContext(audioElement, canvas) {
+
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
             analyser = audioContext.createAnalyser();
-            
+
             source = audioContext.createMediaElementSource(audioElement);
+
             source.connect(analyser);
             analyser.connect(audioContext.destination);
 
-            // Настройка детализации (размер FFT)
-            analyser.fftSize = 256; 
-            
+            analyser.fftSize = 256;
+
             const bufferLength = analyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
+
             const ctx = canvas.getContext('2d');
 
             function renderFrame() {
+
                 animationId = requestAnimationFrame(renderFrame);
 
-                // Обновляем размеры canvas для четкости
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
-                
+
                 const width = canvas.width;
                 const height = canvas.height;
 
@@ -262,69 +450,150 @@
 
                 ctx.clearRect(0, 0, width, height);
 
+                const avg =
+                    dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
+                // Динамический фон
+                const scale = 1 + avg / 500;
+
+                dynamicBg.style.transform = `scale(${scale})`;
+
+                dynamicBg.style.background = `
+                    radial-gradient(circle at center,
+                        rgba(${avg * 2}, 50, 255, 0.45),
+                        rgba(0,0,0,0.95))
+                `;
+
                 const barWidth = (width / bufferLength) * 2.5;
-                let barHeight;
+
                 let x = 0;
 
                 for (let i = 0; i < bufferLength; i++) {
-                    barHeight = dataArray[i] / 255 * height; // Нормализуем высоту
 
-                    // Градиент столбика
-                    const gradient = ctx.createLinearGradient(0, height, 0, height - barHeight);
-                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+                    const barHeight =
+                        dataArray[i] / 255 * height;
+
+                    const gradient =
+                        ctx.createLinearGradient(
+                            0,
+                            height,
+                            0,
+                            height - barHeight
+                        );
+
+                    gradient.addColorStop(
+                        0,
+                        'rgba(255,255,255,0.9)'
+                    );
+
+                    gradient.addColorStop(
+                        1,
+                        'rgba(255,255,255,0.08)'
+                    );
 
                     ctx.fillStyle = gradient;
-                    
-                    // Рисуем столбик с закруглением сверху
-                    roundRect(ctx, x, height - barHeight, barWidth, barHeight, 5);
 
-                    x += barWidth + 2; // +2 это отступ между столбиками
+                    roundRect(
+                        ctx,
+                        x,
+                        height - barHeight,
+                        barWidth,
+                        barHeight,
+                        6
+                    );
+
+                    x += barWidth + 2;
                 }
             }
 
             renderFrame();
         }
 
-        // Функция для рисования закругленных прямоугольников (для красоты)
         function roundRect(ctx, x, y, width, height, radius) {
-            if (height < radius) radius = height; // Защита от слишком маленькой высоты
+
+            if (height < radius) {
+                radius = height;
+            }
+
             ctx.beginPath();
+
             ctx.moveTo(x + radius, y);
+
             ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+
+            ctx.quadraticCurveTo(
+                x + width,
+                y,
+                x + width,
+                y + radius
+            );
+
             ctx.lineTo(x + width, y + height);
+
             ctx.lineTo(x, y + height);
+
             ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
+
+            ctx.quadraticCurveTo(
+                x,
+                y,
+                x + radius,
+                y
+            );
+
             ctx.closePath();
+
             ctx.fill();
         }
 
         function resetPlayer() {
-            // Остановка анимации и аудио контекста
-            if (animationId) cancelAnimationFrame(animationId);
-            if (audioContext) audioContext.close();
+
+            clearTimeout(ambientTimeout);
+
+            glassContainer.classList.remove('ambient');
+
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+
+            if (audioContext) {
+                audioContext.close();
+            }
+
             audioContext = null;
 
             mediaContent.innerHTML = '';
+
             mediaContent.style.display = 'none';
+
             dropZone.style.display = 'block';
+
             closeBtn.style.display = 'none';
+
             fileInput.value = '';
+
             title.textContent = 'Самый простой медиаплеер';
+
             document.querySelector('.subtitle').style.display = 'block';
+
+            dynamicBg.style.background = `
+                radial-gradient(circle at center,
+                    rgba(255,0,150,0.35),
+                    rgba(0,0,0,0.95))
+            `;
         }
     </script>
+
     <!-- Yandex.RTB R-A-18381755-1 -->
     <script>
-    window.yaContextCb.push(() => {
-        Ya.Context.AdvManager.render({
-            "blockId": "R-A-18381755-1",
-            "type": "floorAd",
-            "platform": "touch"
+        window.yaContextCb.push(() => {
+            Ya.Context.AdvManager.render({
+                "blockId": "R-A-18381755-1",
+                "type": "floorAd",
+                "platform": "touch"
+            })
         })
-    })
     </script>
+
 </body>
 </html>
