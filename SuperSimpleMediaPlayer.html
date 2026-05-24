@@ -29,6 +29,7 @@ window.yaContextCb = window.yaContextCb || []
 
 body{
     font-family:'Poppins',sans-serif;
+
     width:100vw;
     height:100vh;
 
@@ -44,7 +45,7 @@ body{
 }
 
 /* =========================
-    ФОН
+    BACKGROUND
 ========================= */
 
 .dynamic-bg{
@@ -58,9 +59,9 @@ body{
     rgba(255,0,150,.4),
     rgba(0,0,0,.98));
 
-    filter:blur(80px);
+    filter:blur(100px);
 
-    transform:scale(1.1);
+    transform:scale(1.15);
 
     transition:
     transform .08s linear,
@@ -101,10 +102,12 @@ body{
 
     position:relative;
 
-    width:90%;
-    max-width:760px;
+    width:92%;
+    max-width:1000px;
 
-    max-height:90vh;
+    min-height:520px;
+
+    max-height:92vh;
 
     overflow:hidden;
 
@@ -132,7 +135,7 @@ body{
     all 1.3s cubic-bezier(.42,0,.58,1);
 }
 
-/* FULLSCREEN AMBIENT MODE */
+/* FULLSCREEN */
 
 .glass-container.ambient{
 
@@ -150,8 +153,8 @@ body{
 
     background:rgba(0,0,0,.22);
 
-    backdrop-filter:blur(55px);
-    -webkit-backdrop-filter:blur(55px);
+    backdrop-filter:blur(60px);
+    -webkit-backdrop-filter:blur(60px);
 
     padding:60px;
 
@@ -187,7 +190,7 @@ h1{
 
     border-radius:24px;
 
-    padding:60px 20px;
+    padding:80px 20px;
 
     cursor:pointer;
 
@@ -208,7 +211,7 @@ input[type=file]{
 }
 
 /* =========================
-    MEDIA CONTENT
+    CONTENT
 ========================= */
 
 #media-content{
@@ -294,7 +297,7 @@ input[type=file]{
 canvas{
 
     width:100%;
-    height:180px;
+    height:220px;
 
     margin-bottom:25px;
 
@@ -383,14 +386,11 @@ video{
     0 20px 60px rgba(0,0,0,.45);
 }
 
-/* =========================
-    MOBILE
-========================= */
-
 @media(max-width:768px){
 
     .glass-container{
         padding:28px;
+        min-height:unset;
     }
 
     .glass-container.ambient{
@@ -446,6 +446,8 @@ accept="image/*,video/*,audio/*"
 <div id="media-content"></div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js"></script>
 
 <script>
 
@@ -556,10 +558,61 @@ function resetAmbientTimer(){
 })
 
 /* =========================
+    GET REAL COVER
+========================= */
+
+function getAudioCover(file){
+
+    return new Promise((resolve)=>{
+
+        jsmediatags.read(file,{
+
+            onSuccess:function(tag){
+
+                const picture =
+                tag.tags.picture
+
+                if(picture){
+
+                    let base64String = ""
+
+                    for(
+                        let i = 0;
+                        i < picture.data.length;
+                        i++
+                    ){
+                        base64String +=
+                        String.fromCharCode(
+                        picture.data[i]
+                        )
+                    }
+
+                    const imageUrl =
+                    `data:${picture.format};base64,${
+                    window.btoa(base64String)
+                    }`
+
+                    resolve(imageUrl)
+
+                }else{
+
+                    resolve(null)
+                }
+            },
+
+            onError:function(){
+
+                resolve(null)
+            }
+        })
+    })
+}
+
+/* =========================
     HANDLE FILE
 ========================= */
 
-function handleFile(file){
+async function handleFile(file){
 
     resetPlayer()
 
@@ -620,7 +673,10 @@ function handleFile(file){
         wrapper.className =
         'audio-layout'
 
-        /* COVER */
+        /* REAL COVER */
+
+        const cover =
+        await getAudioCover(file)
 
         const albumWrapper =
         document.createElement('div')
@@ -635,8 +691,8 @@ function handleFile(file){
         'album-cover'
 
         albumCover.src =
-        'https://picsum.photos/700?random='
-        + Date.now()
+        cover ||
+        'https://raw.githubusercontent.com/NOF7351/KST-Tools/main/Resourses/supersimplemediaplayer-logo.png'
 
         albumWrapper.appendChild(albumCover)
 
@@ -770,14 +826,8 @@ canvas
         )
 
         /* =========================
-            BACKGROUND REACTION
+            BACKGROUND
         ========================= */
-
-        const avg =
-        dataArray.reduce(
-        (a,b)=>a+b,
-        0
-        ) / dataArray.length
 
         const bass =
         dataArray
@@ -791,7 +841,7 @@ canvas
         1 + pulse * .45
 
         const blur =
-        80 + pulse * 180
+        100 + pulse * 180
 
         const saturation =
         1.5 + pulse * 3
@@ -813,7 +863,7 @@ canvas
         ${180 + glow},
         ${40 + bass},
         255,
-        ${0.3 + pulse * .6}
+        ${0.35 + pulse * .6}
         ),
 
         rgba(
@@ -835,15 +885,23 @@ canvas
             VISUALIZER
         ========================= */
 
+        const bars = 90
+
+        const step =
+        Math.floor(bufferLength / bars)
+
         const barWidth =
-        (width / bufferLength) * 2.2
+        width / bars - 4
 
         let x = 0
 
-        for(let i=0;i<bufferLength;i++){
+        for(let i=0;i<bars;i++){
+
+            const value =
+            dataArray[i * step]
 
             const barHeight =
-            dataArray[i] / 255 * height
+            value / 255 * height
 
             const gradient =
             ctx.createLinearGradient(
@@ -874,7 +932,7 @@ canvas
             6
             )
 
-            x += barWidth + 2
+            x += barWidth + 4
         }
     }
 
@@ -1001,7 +1059,7 @@ function resetPlayer(){
 
 </script>
 
-<!-- Yandex.RTB R-A-18381755-1 -->
+<!-- Yandex.RTB -->
 
 <script>
 
