@@ -55,7 +55,7 @@ body{
 
     background:
     radial-gradient(circle at center,
-    rgba(255,0,140,.5),
+    rgba(60,120,255,.55),
     rgba(0,0,0,.98));
 
     filter:blur(120px);
@@ -63,9 +63,9 @@ body{
     transform:scale(1.15);
 
     transition:
-    transform .06s linear,
-    filter .06s linear,
-    background .06s linear;
+    transform .12s ease-out,
+    filter .12s ease-out,
+    background .3s ease;
 }
 
 .overlay{
@@ -77,14 +77,13 @@ body{
     background:
     linear-gradient(
     -45deg,
-    rgba(255,0,140,.08),
-    rgba(0,140,255,.08),
-    rgba(0,255,180,.08),
-    rgba(140,0,255,.08));
+    rgba(255,255,255,.02),
+    rgba(255,255,255,.04),
+    rgba(255,255,255,.02));
 
     background-size:400% 400%;
 
-    animation:bgFlow 14s ease infinite;
+    animation:bgFlow 18s ease infinite;
 }
 
 @keyframes bgFlow{
@@ -170,8 +169,23 @@ body{
 }
 
 /* =========================
-    HEADERS
+    TITLE
 ========================= */
+
+.header-block{
+
+    transition:
+    transform 1s ease,
+    opacity 1s ease;
+}
+
+.glass-container.track-mode .header-block{
+
+    transform:
+    translateY(-180px);
+
+    opacity:0;
+}
 
 h1{
     font-size:2rem;
@@ -264,45 +278,27 @@ input[type=file]{
     display:flex;
     align-items:center;
     justify-content:center;
+
     gap:40px;
 
     margin-bottom:30px;
 
     transition:
-    all 1.2s cubic-bezier(.42,0,.58,1);
+    transform 1.2s cubic-bezier(.42,0,.58,1);
 }
 
-/* INITIAL */
-
-.track-info{
-
-    opacity:0;
-
-    transform:
-    translateX(40px);
-
-    transition:
-    all 1s ease-in-out;
-
-    text-align:left;
-
-    min-width:240px;
+/* ВАЖНО:
+   Изначально НЕ двигаем */
+.glass-container:not(.track-mode) .now-playing{
+    transform:none;
 }
 
-/* SHOW INFO */
-
-.glass-container.track-mode .track-info{
-
-    opacity:1;
-
-    transform:translateX(0);
-}
-
-/* MOVE COVER */
+/* Двигаем ТОЛЬКО после появления track-mode */
 
 .glass-container.track-mode .now-playing{
 
-    transform:translateX(-80px);
+    transform:
+    translateX(-90px);
 }
 
 /* =========================
@@ -319,8 +315,7 @@ input[type=file]{
 
     transition:
     width 1s ease-in-out,
-    opacity 1s ease-in-out,
-    margin-bottom 1s ease-in-out;
+    opacity 1s ease-in-out;
 }
 
 .glass-container.ambient .album-wrapper{
@@ -345,8 +340,31 @@ input[type=file]{
 }
 
 /* =========================
-    TRACK TEXT
+    TRACK INFO
 ========================= */
+
+.track-info{
+
+    opacity:0;
+
+    transform:
+    translateX(60px);
+
+    transition:
+    all 1s ease-in-out;
+
+    text-align:left;
+
+    min-width:260px;
+}
+
+.glass-container.track-mode .track-info{
+
+    opacity:1;
+
+    transform:
+    translateX(0);
+}
 
 .artist{
 
@@ -354,7 +372,7 @@ input[type=file]{
 
     font-weight:400;
 
-    opacity:.65;
+    opacity:.6;
 
     margin-bottom:10px;
 }
@@ -501,6 +519,8 @@ video{
 
 <button id="close-btn" class="close-btn">✕</button>
 
+<div class="header-block" id="header-block">
+
 <h1 id="main-title">
 Супер простой медиаплеер
 </h1>
@@ -508,6 +528,8 @@ video{
 <p class="subtitle">
 Перетащите файл сюда
 </p>
+
+</div>
 
 <div id="drop-zone" class="drop-zone">
 
@@ -610,7 +632,7 @@ fileInput.addEventListener('change',(e)=>{
 closeBtn.addEventListener('click',resetPlayer)
 
 /* =========================
-    AMBIENT TIMER
+    TIMERS
 ========================= */
 
 function resetAmbientTimer(){
@@ -648,7 +670,7 @@ function resetAmbientTimer(){
 })
 
 /* =========================
-    GET TAGS
+    METADATA
 ========================= */
 
 function getAudioMetadata(file){
@@ -708,10 +730,6 @@ function getAudioMetadata(file){
     })
 }
 
-/* =========================
-    REMOVE EXTENSION
-========================= */
-
 function removeExtension(filename){
 
     return filename.replace(
@@ -747,37 +765,7 @@ async function handleFile(file){
 
     let element
 
-    /* IMAGE */
-
-    if(type.startsWith('image/')){
-
-        element =
-        document.createElement('img')
-
-        element.src = fileURL
-
-        mediaContent.appendChild(element)
-    }
-
-    /* VIDEO */
-
-    else if(type.startsWith('video/')){
-
-        element =
-        document.createElement('video')
-
-        element.src = fileURL
-
-        element.controls = true
-
-        element.autoplay = true
-
-        mediaContent.appendChild(element)
-    }
-
-    /* AUDIO */
-
-    else if(type.startsWith('audio/')){
+    if(type.startsWith('audio/')){
 
         const metadata =
         await getAudioMetadata(file)
@@ -787,8 +775,6 @@ async function handleFile(file){
 
         wrapper.className =
         'audio-layout'
-
-        /* NOW PLAYING */
 
         const nowPlaying =
         document.createElement('div')
@@ -816,7 +802,7 @@ async function handleFile(file){
 
         albumWrapper.appendChild(albumCover)
 
-        /* TRACK INFO */
+        /* INFO */
 
         const trackInfo =
         document.createElement('div')
@@ -979,7 +965,7 @@ canvas
         )
 
         /* =========================
-            AUDIO REACTION
+            BACKGROUND
         ========================= */
 
         const bass =
@@ -987,34 +973,17 @@ canvas
         .slice(0,20)
         .reduce((a,b)=>a+b,0) / 20
 
-        const mids =
-        dataArray
-        .slice(40,120)
-        .reduce((a,b)=>a+b,0) / 80
-
-        const highs =
-        dataArray
-        .slice(120,200)
-        .reduce((a,b)=>a+b,0) / 80
-
         const pulse =
         bass / 255
 
-        const hue =
-        (performance.now() / 35 + bass * 1.8)
-        % 360
-
-        const hue2 =
-        (hue + 120) % 360
-
-        const hue3 =
-        (hue + 240) % 360
-
         const scale =
-        1 + pulse * .5
+        1 + pulse * .22
 
         const blur =
-        120 + pulse * 220
+        120 + pulse * 80
+
+        const brightness =
+        1 + pulse * .55
 
         dynamicBg.style.transform =
         `scale(${scale})`
@@ -1022,32 +991,28 @@ canvas
         dynamicBg.style.filter =
         `
         blur(${blur}px)
-        saturate(${1.8 + pulse * 3})
-        brightness(${1 + pulse * .8})
+        brightness(${brightness})
+        saturate(1.4)
         `
 
-        dynamicBg.style.background = `
+        /* ОДИН ЦВЕТ БЕЗ МЕРЦАНИЯ */
+
+        dynamicBg.style.background =
+        `
         radial-gradient(circle at center,
 
-        hsla(
-        ${hue},
-        100%,
-        ${55 + pulse * 25}%,
-        ${0.35 + pulse * .5}
+        rgba(
+        60,
+        120,
+        255,
+        ${0.28 + pulse * .35}
         ),
 
-        hsla(
-        ${hue2},
-        100%,
-        ${45 + mids / 8}%,
-        ${0.25 + pulse * .3}
-        ),
-
-        hsla(
-        ${hue3},
-        100%,
-        ${50 + highs / 10}%,
-        .15
+        rgba(
+        0,
+        40,
+        120,
+        ${0.16 + pulse * .18}
         ),
 
         rgba(0,0,0,.98)
@@ -1086,12 +1051,12 @@ canvas
 
             gradient.addColorStop(
             0,
-            `hsla(${hue},100%,75%,.95)`
+            'rgba(140,180,255,.95)'
             )
 
             gradient.addColorStop(
             1,
-            `hsla(${hue2},100%,60%,.08)`
+            'rgba(255,255,255,.06)'
             )
 
             ctx.fillStyle = gradient
@@ -1224,13 +1189,6 @@ function resetPlayer(){
 
     document.querySelector('.subtitle')
     .style.display = 'block'
-
-    dynamicBg.style.background =
-    `
-    radial-gradient(circle at center,
-    rgba(255,0,150,.5),
-    rgba(0,0,0,.98))
-    `
 }
 
 </script>
