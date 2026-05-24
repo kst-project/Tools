@@ -2,17 +2,16 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Super Simple Media Player</title>
+<title>Ambient Media Player</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
 
 <link rel="icon"
 href="https://raw.githubusercontent.com/NOF7351/KST-Tools/refs/heads/main/Resourses/supersimplemediaplayer-logo.png"
 type="image/x-icon">
 
-<!-- Yandex.RTB -->
 <script>
 window.yaContextCb = window.yaContextCb || []
 </script>
@@ -28,8 +27,6 @@ window.yaContextCb = window.yaContextCb || []
 }
 
 body{
-    font-family:'Poppins',sans-serif;
-
     width:100vw;
     height:100vh;
 
@@ -41,6 +38,8 @@ body{
 
     background:#050505;
 
+    font-family:'Poppins',sans-serif;
+
     color:white;
 }
 
@@ -50,23 +49,23 @@ body{
 
 .dynamic-bg{
     position:fixed;
-    inset:-20%;
+    inset:-25%;
 
     z-index:-3;
 
     background:
     radial-gradient(circle at center,
-    rgba(255,0,150,.4),
+    rgba(255,0,140,.5),
     rgba(0,0,0,.98));
 
-    filter:blur(100px);
+    filter:blur(120px);
 
     transform:scale(1.15);
 
     transition:
-    transform .08s linear,
-    filter .08s linear,
-    background .08s linear;
+    transform .06s linear,
+    filter .06s linear,
+    background .06s linear;
 }
 
 .overlay{
@@ -78,20 +77,29 @@ body{
     background:
     linear-gradient(
     -45deg,
-    rgba(255,0,140,.18),
-    rgba(0,140,255,.18),
-    rgba(0,255,180,.18),
-    rgba(140,0,255,.18));
+    rgba(255,0,140,.08),
+    rgba(0,140,255,.08),
+    rgba(0,255,180,.08),
+    rgba(140,0,255,.08));
 
     background-size:400% 400%;
 
-    animation:bgFlow 16s ease infinite;
+    animation:bgFlow 14s ease infinite;
 }
 
 @keyframes bgFlow{
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
 }
 
 /* =========================
@@ -103,7 +111,7 @@ body{
     position:relative;
 
     width:92%;
-    max-width:1000px;
+    max-width:1050px;
 
     min-height:520px;
 
@@ -119,9 +127,9 @@ body{
 
     padding:42px;
 
-    border-radius:32px;
+    border-radius:34px;
 
-    background:rgba(255,255,255,.07);
+    background:rgba(255,255,255,.06);
 
     border:1px solid rgba(255,255,255,.08);
 
@@ -134,8 +142,6 @@ body{
     transition:
     all 1.3s cubic-bezier(.42,0,.58,1);
 }
-
-/* FULLSCREEN */
 
 .glass-container.ambient{
 
@@ -151,42 +157,44 @@ body{
     border:none;
     border-radius:0;
 
-    background:rgba(0,0,0,.22);
-
-    backdrop-filter:blur(60px);
-    -webkit-backdrop-filter:blur(60px);
-
     padding:60px;
 
-    box-shadow:none;
+    background:rgba(0,0,0,.18);
+
+    backdrop-filter:blur(65px);
+    -webkit-backdrop-filter:blur(65px);
 
     justify-content:center;
+
+    box-shadow:none;
 }
 
 /* =========================
-    TITLE
+    HEADERS
 ========================= */
 
 h1{
-    margin-bottom:8px;
     font-size:2rem;
     font-weight:600;
+
+    margin-bottom:8px;
 }
 
 .subtitle{
-    opacity:.75;
+    opacity:.7;
+
     margin-bottom:28px;
 }
 
 /* =========================
-    DROP ZONE
+    DROPZONE
 ========================= */
 
 .drop-zone{
 
     width:100%;
 
-    border:2px dashed rgba(255,255,255,.25);
+    border:2px dashed rgba(255,255,255,.22);
 
     border-radius:24px;
 
@@ -198,12 +206,8 @@ h1{
 }
 
 .drop-zone:hover{
-    background:rgba(255,255,255,.06);
+    background:rgba(255,255,255,.05);
     border-color:white;
-}
-
-.drop-zone span{
-    font-size:1.15rem;
 }
 
 input[type=file]{
@@ -226,10 +230,12 @@ input[type=file]{
 }
 
 @keyframes fade{
+
     from{
         opacity:0;
         transform:translateY(20px);
     }
+
     to{
         opacity:1;
         transform:none;
@@ -237,7 +243,7 @@ input[type=file]{
 }
 
 /* =========================
-    AUDIO LAYOUT
+    AUDIO AREA
 ========================= */
 
 .audio-layout{
@@ -247,6 +253,56 @@ input[type=file]{
     display:flex;
     flex-direction:column;
     align-items:center;
+}
+
+/* =========================
+    NOW PLAYING
+========================= */
+
+.now-playing{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:40px;
+
+    margin-bottom:30px;
+
+    transition:
+    all 1.2s cubic-bezier(.42,0,.58,1);
+}
+
+/* INITIAL */
+
+.track-info{
+
+    opacity:0;
+
+    transform:
+    translateX(40px);
+
+    transition:
+    all 1s ease-in-out;
+
+    text-align:left;
+
+    min-width:240px;
+}
+
+/* SHOW INFO */
+
+.glass-container.track-mode .track-info{
+
+    opacity:1;
+
+    transform:translateX(0);
+}
+
+/* MOVE COVER */
+
+.glass-container.track-mode .now-playing{
+
+    transform:translateX(-80px);
 }
 
 /* =========================
@@ -272,8 +328,6 @@ input[type=file]{
     width:320px;
 
     opacity:1;
-
-    margin-bottom:30px;
 }
 
 .album-cover{
@@ -286,8 +340,34 @@ input[type=file]{
     border-radius:28px;
 
     box-shadow:
-    0 30px 80px rgba(0,0,0,.55),
+    0 30px 90px rgba(0,0,0,.6),
     0 0 80px rgba(255,255,255,.08);
+}
+
+/* =========================
+    TRACK TEXT
+========================= */
+
+.artist{
+
+    font-size:1rem;
+
+    font-weight:400;
+
+    opacity:.65;
+
+    margin-bottom:10px;
+}
+
+.song-title{
+
+    font-size:2rem;
+
+    line-height:1.1;
+
+    font-weight:700;
+
+    word-break:break-word;
 }
 
 /* =========================
@@ -297,11 +377,11 @@ input[type=file]{
 canvas{
 
     width:100%;
-    height:220px;
-
-    margin-bottom:25px;
+    height:240px;
 
     border-radius:20px;
+
+    margin-bottom:24px;
 }
 
 /* =========================
@@ -320,11 +400,11 @@ audio{
 
     margin-top:18px;
 
+    background:rgba(0,0,0,.25);
+
     padding:7px 18px;
 
     border-radius:999px;
-
-    background:rgba(0,0,0,.25);
 
     font-size:.9rem;
 
@@ -342,8 +422,8 @@ audio{
     top:20px;
     right:20px;
 
-    width:42px;
-    height:42px;
+    width:44px;
+    height:44px;
 
     border:none;
 
@@ -353,7 +433,7 @@ audio{
 
     color:white;
 
-    font-size:1.3rem;
+    font-size:1.2rem;
 
     cursor:pointer;
 
@@ -365,8 +445,10 @@ audio{
 }
 
 .close-btn:hover{
+
     transform:scale(1.12);
-    background:rgba(255,255,255,.15);
+
+    background:rgba(255,255,255,.16);
 }
 
 /* =========================
@@ -380,32 +462,30 @@ video{
 
     max-height:65vh;
 
-    border-radius:24px;
+    border-radius:28px;
 
     box-shadow:
     0 20px 60px rgba(0,0,0,.45);
 }
 
-@media(max-width:768px){
+@media(max-width:900px){
 
-    .glass-container{
-        padding:28px;
-        min-height:unset;
+    .glass-container.track-mode .now-playing{
+        transform:none;
     }
 
-    .glass-container.ambient{
-        padding:30px;
+    .now-playing{
+        flex-direction:column;
+        text-align:center;
     }
 
-    .glass-container.ambient .album-wrapper{
-        width:220px;
+    .track-info{
+        text-align:center;
     }
 
-    .album-cover{
-        width:220px;
-        height:220px;
+    .song-title{
+        font-size:1.5rem;
     }
-
 }
 
 </style>
@@ -476,7 +556,9 @@ let audioContext
 let analyser
 let source
 let animationId
+
 let ambientTimeout = null
+let trackInfoTimeout = null
 
 /* =========================
     EVENTS
@@ -491,7 +573,7 @@ dropZone.addEventListener('dragover',(e)=>{
     e.preventDefault()
 
     dropZone.style.background =
-    'rgba(255,255,255,.08)'
+    'rgba(255,255,255,.06)'
 })
 
 dropZone.addEventListener('dragleave',()=>{
@@ -534,14 +616,22 @@ closeBtn.addEventListener('click',resetPlayer)
 function resetAmbientTimer(){
 
     glassContainer.classList.remove('ambient')
+    glassContainer.classList.remove('track-mode')
 
     clearTimeout(ambientTimeout)
+    clearTimeout(trackInfoTimeout)
 
     ambientTimeout = setTimeout(()=>{
 
         glassContainer.classList.add('ambient')
 
-    },5000)
+        trackInfoTimeout = setTimeout(()=>{
+
+            glassContainer.classList.add('track-mode')
+
+        },2000)
+
+    },7000)
 }
 
 ;[
@@ -558,10 +648,10 @@ function resetAmbientTimer(){
 })
 
 /* =========================
-    GET REAL COVER
+    GET TAGS
 ========================= */
 
-function getAudioCover(file){
+function getAudioMetadata(file){
 
     return new Promise((resolve)=>{
 
@@ -569,43 +659,65 @@ function getAudioCover(file){
 
             onSuccess:function(tag){
 
-                const picture =
-                tag.tags.picture
+                const tags = tag.tags
 
-                if(picture){
+                let imageUrl = null
+
+                if(tags.picture){
 
                     let base64String = ""
 
                     for(
                         let i = 0;
-                        i < picture.data.length;
+                        i < tags.picture.data.length;
                         i++
                     ){
                         base64String +=
                         String.fromCharCode(
-                        picture.data[i]
+                        tags.picture.data[i]
                         )
                     }
 
-                    const imageUrl =
-                    `data:${picture.format};base64,${
+                    imageUrl =
+                    `data:${tags.picture.format};base64,${
                     window.btoa(base64String)
                     }`
-
-                    resolve(imageUrl)
-
-                }else{
-
-                    resolve(null)
                 }
+
+                resolve({
+
+                    cover:imageUrl,
+
+                    artist:
+                    tags.artist || '',
+
+                    title:
+                    tags.title || ''
+                })
             },
 
             onError:function(){
 
-                resolve(null)
+                resolve({
+                    cover:null,
+                    artist:'',
+                    title:''
+                })
             }
         })
     })
+}
+
+/* =========================
+    REMOVE EXTENSION
+========================= */
+
+function removeExtension(filename){
+
+    return filename.replace(
+    /\.[^/.]+$/,
+    ""
+    )
 }
 
 /* =========================
@@ -667,16 +779,24 @@ async function handleFile(file){
 
     else if(type.startsWith('audio/')){
 
+        const metadata =
+        await getAudioMetadata(file)
+
         const wrapper =
         document.createElement('div')
 
         wrapper.className =
         'audio-layout'
 
-        /* REAL COVER */
+        /* NOW PLAYING */
 
-        const cover =
-        await getAudioCover(file)
+        const nowPlaying =
+        document.createElement('div')
+
+        nowPlaying.className =
+        'now-playing'
+
+        /* COVER */
 
         const albumWrapper =
         document.createElement('div')
@@ -691,10 +811,47 @@ async function handleFile(file){
         'album-cover'
 
         albumCover.src =
-        cover ||
+        metadata.cover ||
         'https://raw.githubusercontent.com/NOF7351/KST-Tools/main/Resourses/supersimplemediaplayer-logo.png'
 
         albumWrapper.appendChild(albumCover)
+
+        /* TRACK INFO */
+
+        const trackInfo =
+        document.createElement('div')
+
+        trackInfo.className =
+        'track-info'
+
+        if(metadata.artist){
+
+            const artist =
+            document.createElement('div')
+
+            artist.className =
+            'artist'
+
+            artist.textContent =
+            metadata.artist
+
+            trackInfo.appendChild(artist)
+        }
+
+        const titleText =
+        document.createElement('div')
+
+        titleText.className =
+        'song-title'
+
+        titleText.textContent =
+        metadata.title ||
+        removeExtension(file.name)
+
+        trackInfo.appendChild(titleText)
+
+        nowPlaying.appendChild(albumWrapper)
+        nowPlaying.appendChild(trackInfo)
 
         /* CANVAS */
 
@@ -715,10 +872,8 @@ async function handleFile(file){
         element.crossOrigin =
         'anonymous'
 
-        wrapper.appendChild(albumWrapper)
-
+        wrapper.appendChild(nowPlaying)
         wrapper.appendChild(canvas)
-
         wrapper.appendChild(element)
 
         mediaContent.appendChild(wrapper)
@@ -742,8 +897,6 @@ async function handleFile(file){
             resetAmbientTimer()
         }
     }
-
-    /* FILE INFO */
 
     const info =
     document.createElement('div')
@@ -826,60 +979,80 @@ canvas
         )
 
         /* =========================
-            BACKGROUND
+            AUDIO REACTION
         ========================= */
 
         const bass =
         dataArray
-        .slice(0,18)
-        .reduce((a,b)=>a+b,0) / 18
+        .slice(0,20)
+        .reduce((a,b)=>a+b,0) / 20
+
+        const mids =
+        dataArray
+        .slice(40,120)
+        .reduce((a,b)=>a+b,0) / 80
+
+        const highs =
+        dataArray
+        .slice(120,200)
+        .reduce((a,b)=>a+b,0) / 80
 
         const pulse =
         bass / 255
 
+        const hue =
+        (performance.now() / 35 + bass * 1.8)
+        % 360
+
+        const hue2 =
+        (hue + 120) % 360
+
+        const hue3 =
+        (hue + 240) % 360
+
         const scale =
-        1 + pulse * .45
+        1 + pulse * .5
 
         const blur =
-        100 + pulse * 180
-
-        const saturation =
-        1.5 + pulse * 3
-
-        const glow =
-        120 + bass
+        120 + pulse * 220
 
         dynamicBg.style.transform =
         `scale(${scale})`
 
         dynamicBg.style.filter =
-        `blur(${blur}px)
-        saturate(${saturation})`
+        `
+        blur(${blur}px)
+        saturate(${1.8 + pulse * 3})
+        brightness(${1 + pulse * .8})
+        `
 
         dynamicBg.style.background = `
         radial-gradient(circle at center,
 
-        rgba(
-        ${180 + glow},
-        ${40 + bass},
-        255,
-        ${0.35 + pulse * .6}
+        hsla(
+        ${hue},
+        100%,
+        ${55 + pulse * 25}%,
+        ${0.35 + pulse * .5}
         ),
 
-        rgba(
-        120,
-        0,
-        255,
-        ${0.2 + pulse * .5}
+        hsla(
+        ${hue2},
+        100%,
+        ${45 + mids / 8}%,
+        ${0.25 + pulse * .3}
         ),
 
-        rgba(
-        0,
-        0,
-        0,
-        .99
+        hsla(
+        ${hue3},
+        100%,
+        ${50 + highs / 10}%,
+        .15
+        ),
+
+        rgba(0,0,0,.98)
         )
-        )`
+        `
 
         /* =========================
             VISUALIZER
@@ -913,12 +1086,12 @@ canvas
 
             gradient.addColorStop(
             0,
-            'rgba(255,255,255,.95)'
+            `hsla(${hue},100%,75%,.95)`
             )
 
             gradient.addColorStop(
             1,
-            'rgba(255,255,255,.08)'
+            `hsla(${hue2},100%,60%,.08)`
             )
 
             ctx.fillStyle = gradient
@@ -1008,13 +1181,16 @@ radius
 
 function resetPlayer(){
 
-    clearTimeout(
-    ambientTimeout
-    )
+    clearTimeout(ambientTimeout)
+    clearTimeout(trackInfoTimeout)
 
     glassContainer
     .classList
     .remove('ambient')
+
+    glassContainer
+    .classList
+    .remove('track-mode')
 
     if(animationId){
 
@@ -1052,14 +1228,12 @@ function resetPlayer(){
     dynamicBg.style.background =
     `
     radial-gradient(circle at center,
-    rgba(255,0,150,.4),
+    rgba(255,0,150,.5),
     rgba(0,0,0,.98))
     `
 }
 
 </script>
-
-<!-- Yandex.RTB -->
 
 <script>
 
