@@ -3,56 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Проверка безопасности</title>
+<title>KST Check</title>
 
 <style>
-body{
+*{
     margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
     height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    background:#f0f2f5;
+    background:#f5f5f5;
     font-family:Arial,sans-serif;
 }
 
-.captcha{
-    background:white;
+.verify-box{
+    width:340px;
+    height:78px;
+    background:#fff;
     border:1px solid #d3d3d3;
-    border-radius:4px;
-    padding:20px;
     display:flex;
     align-items:center;
-    gap:15px;
+    justify-content:space-between;
+    padding:0 14px;
     cursor:pointer;
-    box-shadow:0 2px 10px rgba(0,0,0,.1);
+    user-select:none;
+    box-shadow:0 1px 4px rgba(0,0,0,.12);
+    transition:.15s;
+}
+
+.verify-box:hover{
+    box-shadow:0 2px 8px rgba(0,0,0,.16);
+}
+
+.left{
+    display:flex;
+    align-items:center;
+    gap:14px;
 }
 
 .checkbox{
     width:28px;
     height:28px;
-    border:2px solid #aaa;
-    border-radius:3px;
+    border:2px solid #b5b5b5;
+    background:#fff;
     position:relative;
+    flex-shrink:0;
 }
 
-.checkbox.checked::after{
-    content:"✓";
+.checkmark{
     position:absolute;
-    left:4px;
-    top:-2px;
-    font-size:24px;
-    color:#0095ff;
+    left:1px;
+    top:1px;
+    width:22px;
+    height:22px;
 }
 
-.video-container{
+.checkmark path{
+    fill:none;
+    stroke:#34a853;
+    stroke-width:3;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+
+    stroke-dasharray:30;
+    stroke-dashoffset:30;
+    opacity:0;
+}
+
+.checkbox.checked .checkmark path{
+    animation:drawCheck .4s ease forwards;
+}
+
+@keyframes drawCheck{
+    from{
+        stroke-dashoffset:30;
+        opacity:0;
+    }
+    to{
+        stroke-dashoffset:0;
+        opacity:1;
+    }
+}
+
+.text{
+    font-size:14px;
+    color:#222;
+}
+
+.logo-area{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    font-size:10px;
+    color:#777;
+}
+
+.logo-area img{
+    width:34px;
+    height:34px;
+    object-fit:contain;
+    margin-bottom:2px;
+}
+
+.video-screen{
     display:none;
     width:100vw;
     height:100vh;
-    background:black;
+    background:#000;
 }
 
-video{
+.video-screen video{
     width:100%;
     height:100%;
     object-fit:cover;
@@ -61,29 +126,51 @@ video{
 </head>
 <body>
 
-<div class="captcha" id="captcha">
-    <div class="checkbox" id="checkbox"></div>
-    <span>Я не робот</span>
+<div class="verify-box" id="verify">
+    <div class="left">
+        <div class="checkbox" id="checkbox">
+            <svg class="checkmark" viewBox="0 0 24 24">
+                <path d="M5 13L10 18L19 7"></path>
+            </svg>
+        </div>
+
+        <div class="text">
+            Подтвердите, что вы человек
+        </div>
+    </div>
+
+    <div class="logo-area">
+        <img src="https://raw.githubusercontent.com/kst-project/Tools/refs/heads/main/Resourses/kstca.png" alt="KST">
+        <div></div>
+    </div>
 </div>
 
-<div class="video-container" id="player">
+<div class="video-screen" id="videoScreen">
     <video id="video" playsinline>
         <source src="https://github.com/kst-project/Tools/raw/refs/heads/main/Resourses/not_rickroll.mp4" type="video/mp4">
     </video>
 </div>
 
 <script>
-document.getElementById("captcha").addEventListener("click", async () => {
+const verify = document.getElementById("verify");
+const checkbox = document.getElementById("checkbox");
 
-    document.getElementById("checkbox").classList.add("checked");
+verify.addEventListener("click", async () => {
+
+    if (checkbox.classList.contains("checked")) {
+        return;
+    }
+
+    checkbox.classList.add("checked");
 
     setTimeout(async () => {
 
-        document.getElementById("captcha").style.display = "none";
-        document.getElementById("player").style.display = "block";
+        document.getElementById("verify").style.display = "none";
+        document.getElementById("videoScreen").style.display = "block";
 
         const video = document.getElementById("video");
-        video.volume = 1;
+
+        video.volume = 1.0;
 
         try {
             await video.play();
@@ -91,7 +178,12 @@ document.getElementById("captcha").addEventListener("click", async () => {
             console.error(e);
         }
 
-    }, 500);
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        }
+
+    }, 700);
+
 });
 </script>
 
